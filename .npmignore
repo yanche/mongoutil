@@ -1,0 +1,6 @@
+*.ts
+!*.d.ts
+*.tgz
+tsconfig.json
+.npmignore
+.gitignore

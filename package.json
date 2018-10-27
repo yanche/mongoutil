@@ -1,0 +1,16 @@
+{
+  "name": "@belongs/mongoutil",
+  "version": "0.0.1",
+  "description": "",
+  "main": "",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@belongs/asyncutil": "0.0.3",
+    "@types/mongodb": "^3.1.13",
+    "mongodb": "^3.1.8"
+  }
+}
