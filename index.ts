@@ -107,6 +107,26 @@ export class CollClient<T> {
         });
     }
 
+    public async findAndModify(filter: Object, update: Object, options?: {
+        fields?: PartialFields<T>;
+        returnnew?: boolean;
+        upsert?: boolean;
+        sort?: Object;
+    }): Promise<T> {
+        options = options || {};
+        const col = await this._colhub.get();
+        return new Promise<T>((res, rej) => {
+            col.findOneAndUpdate(filter, update, {
+                sort: options.sort,
+                returnOriginal: !options.returnnew,
+                upsert: options.upsert,
+                projection: options.fields || this._fields
+            }, (err: Error, ret: mongodb.FindAndModifyWriteOpResultObject) => {
+                err ? rej(err) : res(ret.value);
+            });
+        });
+    }
+
     constructor(dbhub: Hub<mongodb.Db>, collname: string, fields: Fields<T>) {
         this._colhub = new Hub<mongodb.Collection>(() => dbhub.get().then(db => db.collection(collname)));
         this._fields = fields;
