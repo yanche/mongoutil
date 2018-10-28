@@ -54,10 +54,10 @@ export class CollClient<T> {
         });
     }
 
-    public async updateAll(filter: Object, update: Object): Promise<number> {
+    public async updateAll(filter: Object, update: Object, upsert?: boolean): Promise<number> {
         const col = await this._colhub.get();
         return new Promise<number>((res, rej) => {
-            col.updateMany(filter, update, null, (err: Error, ret: mongodb.UpdateWriteOpResult) => {
+            col.updateMany(filter, update, { upsert: upsert || false, arrayFilters: undefined }, (err: Error, ret: mongodb.UpdateWriteOpResult) => {
                 err ? rej(err) : res(ret.modifiedCount);
             });
         });
