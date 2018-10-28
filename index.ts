@@ -3,15 +3,17 @@ import * as mongodb from "mongodb";
 import { Hub } from "@belongs/asyncutil";
 import * as url from "url";
 
-export interface Fields {
-    [key: string]: 1;
+export type Fields<T> = {
+    [P in keyof T]: 1;
 }
+
+export type PartialFields<T> = Partial<Fields<T>>;
 
 export class CollClient<T> {
     private readonly _colhub: Hub<mongodb.Collection>;
-    private readonly _fields: Fields;
+    private readonly _fields: Fields<T>;
 
-    public async getOne(filter: Object, fields?: Fields): Promise<T> {
+    public async getOne(filter: Object, fields?: PartialFields<T>): Promise<T> {
         const col = await this._colhub.get();
         return new Promise<T>((res, rej) => {
             col.findOne(filter, { projection: fields || this._fields }, (err: Error, doc: T) => {
@@ -20,7 +22,7 @@ export class CollClient<T> {
         });
     }
 
-    public async getAll(filter: Object, fields?: Fields): Promise<Array<T>> {
+    public async getAll(filter: Object, fields?: PartialFields<T>): Promise<Array<T>> {
         const col = await this._colhub.get();
         return new Promise<Array<T>>((res, rej) => {
             const cursor = col.find(filter, { projection: fields || this._fields });
@@ -30,7 +32,7 @@ export class CollClient<T> {
         });
     }
 
-    public async getMul(filter: Object, fields: Fields, orderby: Object, skip: number, take: number): Promise<Array<T>> {
+    public async getMul(filter: Object, fields: PartialFields<T>, orderby: Object, skip: number, take: number): Promise<Array<T>> {
         const col = await this._colhub.get();
         return new Promise<Array<T>>((res, rej) => {
             let cursor = col.find(filter, { projection: fields || this._fields });
@@ -105,7 +107,7 @@ export class CollClient<T> {
         });
     }
 
-    constructor(dbhub: Hub<mongodb.Db>, collname: string, fields: Fields) {
+    constructor(dbhub: Hub<mongodb.Db>, collname: string, fields: Fields<T>) {
         this._colhub = new Hub<mongodb.Collection>(() => dbhub.get().then(db => db.collection(collname)));
         this._fields = fields;
     }
@@ -114,7 +116,7 @@ export class CollClient<T> {
 export class DbClient {
     private readonly _dbhub: Hub<mongodb.Db>;
 
-    public getCollClient<T>(collname: string, fields: Fields): CollClient<T> {
+    public getCollClient<T>(collname: string, fields: Fields<T>): CollClient<T> {
         return new CollClient<T>(this._dbhub, collname, fields);
     }
 
