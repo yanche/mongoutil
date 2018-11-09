@@ -140,11 +140,13 @@ export class DbClient {
         return new CollClient<T>(this._dbhub, collname, fields);
     }
 
-    constructor(connstr: string) {
+    constructor(connstr: string, options?: mongodb.MongoClientOptions) {
         this._dbhub = new Hub<mongodb.Db>(async () => {
-            const client = await mongodb.connect(connstr, { useNewUrlParser: true });
+            options = options || {};
+            options.useNewUrlParser = true;
+            const client = await mongodb.connect(connstr, options);
             return client.db(dbNameFromUrl(connstr));
-        })
+        });
     }
 }
 
