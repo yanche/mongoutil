@@ -127,6 +127,15 @@ export class CollClient<T> {
         });
     }
 
+    public async deleteAll(filter: Object): Promise<number> {
+        const col = await this._colhub.get();
+        return new Promise<number>((res, rej) => {
+            col.deleteMany(filter, (err: Error, ret: mongodb.DeleteWriteOpResultObject) => {
+                err ? rej(err) : res(ret.deletedCount);
+            });
+        });
+    }
+
     constructor(dbhub: Hub<mongodb.Db>, collname: string, fields: Fields<T>) {
         this._colhub = new Hub<mongodb.Collection>(() => dbhub.get().then(db => db.collection(collname)));
         this._fields = fields;
